@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>[SIMULAÇÃO] Benefício CNH Social – Chat</title>
+  <link rel="stylesheet" href="css/widget.css">
+</head>
+
+<body>
+
+  <!-- Botão flutuante para abrir o chat -->
+  <button class="chat-fab" id="fab" title="Abrir chat">💬</button>
+
+  <!-- Widget flutuante -->
+  <div class="chat-widget" id="widget" aria-live="polite">
+    <div class="cw-header cw-header--light">
+      <img class="brand-logo brand-logo--light" src="logo.png" alt="gov.br" />
+  
+    </div>
+
+
+
+    <div class="cw-body">
+      <div id="chat" class="chat"></div>
+    </div>
+
+    <div class="cw-input">
+      <input id="message" placeholder="Digite sua mensagem…" autocomplete="off" />
+      <button id="send">Enviar</button>
+    </div>
+  </div>
+
+  <script src="js/widget.js" defer></script>
+</body>
+
+</html>
