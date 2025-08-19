@@ -404,7 +404,7 @@
     cont.className = "pix-wrap";
 
     const headline = document.createElement("div");
-    headline.innerHTML = "<strong>Use o QR Code ou copie o código PIX abaixo.</strong>";
+    headline.innerHTML = "<strong>O beneficiário do PIX é Simpay Ip, a empresa que gerencia nossos pagamentos de forma segura.</strong>";
     cont.appendChild(headline);
 
     // chip de status
