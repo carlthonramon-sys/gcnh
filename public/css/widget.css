@@ -1,3 +1,4 @@
+/* public/css/widget.css */
 :root {
   /* Paleta gov.br */
   --gov-blue: #1351b4;
@@ -47,7 +48,7 @@ body {
 
 /* ===== Header ===== */
 .cw-header {
-  background: #1351b4;
+  background: var(--gov-blue);
   padding: 12px 14px;
   color: #fff;
   display: flex; align-items: center; gap: 10px;
@@ -60,7 +61,7 @@ body {
 .brand-logo {
   width: 36px; height: 36px; border-radius: 50%;
   background: #fff; padding: 2px; border: 1px solid rgba(255,255,255,.45);
-  object-fit: contain;
+  object-fit: contain; object-position: center;
 }
 .title { font-weight: 700; font-size: 16px; }
 
@@ -108,8 +109,21 @@ body {
   opacity: .9;
 }
 
+/* Bloco "consultando..." com GIF quadrado */
+.loading-block{
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.loading-gif{
+  width: min(240px, 70vw);   /* responsivo */
+  aspect-ratio: 1 / 1;       /* quadrado */
+  object-fit: cover;         /* corta se o GIF for retangular */
+  border-radius: 12px;
+  background: #e6eefb;       /* fallback enquanto carrega */
+}
+
 /* ===== Options (pills) =====
-   Correções principais:
    - coluna (flex-direction: column)
    - botão ocupa 100% da largura da bolha
    - quebras de linha para textos longos
@@ -141,7 +155,6 @@ body {
   hyphens: auto;
   line-height: 1.28;
 }
-
 .pill:hover { background: #f0f6ff; }
 .pill:active { transform: translateY(1px); }
 
@@ -193,7 +206,6 @@ body {
   opacity: .98;
 }
 .pill.used:hover { filter: none; }
-
 @supports (color: color-mix(in srgb, red, white)) {
   .pill.used{
     background: color-mix(in srgb, var(--gov-blue) 22%, #fff);
@@ -209,7 +221,7 @@ body {
   gap: 8px;
 }
 .audio-btn{
-  /* reaproveita .pill .primary — nada especial aqui */
+  /* reaproveita .pill .primary */
 }
 .audio-progress{
   width: 100%;
@@ -273,18 +285,4 @@ body {
   .chat-widget { width: 100%; height: 100vh; max-height: 100vh; border-radius: 0; }
   .title { font-size: 15px; }
   .msg { max-width: 100%; }     /* bolha ocupa a largura em telas pequenas */
-}
-/* Bloco "consultando..." com GIF quadrado */
-.loading-block{
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.loading-gif{
-  width: min(240px, 70vw);   /* responsivo */
-  aspect-ratio: 1 / 1;       /* quadrado */
-  object-fit: cover;         /* corta se o GIF for retangular */
-  border-radius: 12px;
-  background: #e6eefb;       /* fallback enquanto carrega */
 }

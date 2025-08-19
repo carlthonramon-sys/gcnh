@@ -6,8 +6,9 @@ import { TYPING_MIN_MS, TYPING_MAX_MS } from "../config/constants.js";
 const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
 /**
- * Mensagem de texto do bot.
- * Aceita: options[], typingMs, ephemeralMs e quaisquer outros campos extras seguros.
+ * Mensagem de TEXTO do bot.
+ * Aceita: options[], typingMs, ephemeralMs e quaisquer outros campos extras seguros
+ * (ex.: style, gate, data-*).
  */
 export function bot(text = "", extra = {}) {
   const typingMs = Number.isFinite(extra.typingMs)
@@ -25,21 +26,23 @@ export function bot(text = "", extra = {}) {
     msg.options = extra.options;
   }
 
-  // tempo para desaparecer automaticamente
+  // tempo para desaparecer automaticamente (ms)
   if (Number.isFinite(extra.ephemeralMs) && extra.ephemeralMs > 0) {
     msg.ephemeralMs = extra.ephemeralMs;
   }
 
-  // anexa outros campos extras sem sobrescrever os principais
+  // Permite anexar quaisquer campos extras (sem sobrescrever os principais)
   const { options, typingMs: _t, ephemeralMs: _e, ...rest } = extra;
-  Object.assign(msg, rest);
+  Object.assign(msg, rest); // ex.: { style: "pending" }
 
   return msg;
 }
 
 /**
- * Mensagem de áudio do bot.
- * Aceita: title, duration (opcional), typingMs, ephemeralMs e extras.
+ * Mensagem de ÁUDIO do bot.
+ * Aceita: title, duration (opcional), typingMs, ephemeralMs e extras (ex.: gate).
+ * - gate: identificador para o front enviar quando o áudio terminar:
+ *         "__AUDIO_DONE__:<gate>"
  */
 export function botAudio(src, meta = {}) {
   const typingMs = Number.isFinite(meta.typingMs)
@@ -48,7 +51,7 @@ export function botAudio(src, meta = {}) {
 
   const audio = {
     src,
-    title: meta.title || "Ouvir explicação",
+    title: meta.title || "Ouvir áudio",
   };
   if (meta.duration != null) audio.duration = meta.duration;
 
@@ -58,13 +61,14 @@ export function botAudio(src, meta = {}) {
     audio,
   };
 
+  // desaparecer automático (ms), se quiser
   if (Number.isFinite(meta.ephemeralMs) && meta.ephemeralMs > 0) {
     msg.ephemeralMs = meta.ephemeralMs;
   }
 
-  // extras adicionais
+  // Extras adicionais (ex.: gate)
   const { typingMs: _t, ephemeralMs: _e, title, duration, ...rest } = meta;
-  Object.assign(msg, rest);
+  Object.assign(msg, rest); // ex.: { gate: "after_payment_notice" }
 
   return msg;
 }

@@ -11,11 +11,11 @@ import {
   onlyDigits,
 } from "./identityService.js";
 
-/* ---------- tempos (ajuste aqui) ---------- */
-const HOURGLASS_VISIBLE_MS = 2500;     // quanto tempo a ampulheta fica visível
-const GAP_AFTER_HOURGLASS_MS = 400;    // folga antes do próximo bloco
+/* ========== Tempos (ajuste livre) ========== */
+const HOURGLASS_VISIBLE_MS = 2500;   // quanto tempo a ampulheta fica visível
+const GAP_AFTER_HOURGLASS_MS = 400;  // folga antes do próximo bloco
 
-/* ---------- helpers ---------- */
+/* ========== Helpers ========== */
 const isLike = (txt, ...cands) => {
   const t = (txt || "").trim().toLowerCase();
   return cands.some((c) => t === c.toLowerCase());
@@ -31,13 +31,13 @@ function normalizeBrDateInput(s) {
   const v = (s || "").trim();
   if (/^\d{2}\/\d{2}\/\d{4}$/.test(v)) return v;
   const d = onlyDigits(v);
-  if (d.length === 8) return `${d.slice(0,2)}/${d.slice(2,4)}/${d.slice(4)}`;
+  if (d.length === 8) return `${d.slice(0, 2)}/${d.slice(2, 4)}/${d.slice(4)}`;
   return v;
 }
 
-/* ---------- blocos visuais de final ---------- */
+/* ========== Blocos visuais finais ========== */
 
-// 1) Ampulheta (texto + GIF) que some sozinha
+// 1) Ampulheta (texto + GIF) que desaparece sozinha
 function consultingMsg(ms = HOURGLASS_VISIBLE_MS) {
   return bot(
     `<div class="loading-block">
@@ -48,7 +48,7 @@ function consultingMsg(ms = HOURGLASS_VISIBLE_MS) {
   );
 }
 
-// 2) Aprovado: **somente o GIF** (sem texto)
+// 2) Aprovado: SOMENTE o GIF (sem texto)
 function approvedGifMsg() {
   return bot(
     `<div class="loading-block">
@@ -62,34 +62,42 @@ function approvedGifMsg() {
 function approvedAudioMsg() {
   return botAudio("/audio/proximos-passos.mp3", {
     title: "Ouvir próximos passos",
-    typingMs: HOURGLASS_VISIBLE_MS + GAP_AFTER_HOURGLASS_MS + 600, // vem logo depois do GIF
+    // 'gate' permite ao front liberar o próximo botão somente após o áudio
+    gate: "approved_audio_done",
+    typingMs: HOURGLASS_VISIBLE_MS + GAP_AFTER_HOURGLASS_MS + 600,
     noJitter: true,
   });
 }
 
-/* ---------- fluxo ---------- */
+/* ========== Fluxo principal ========== */
 export async function nextMessages(session, text) {
   const flow = ensureFlow(session);
   const messages = [];
   const userText = (text || "").trim();
 
-  // atalhos globais
+  // ---- atalhos globais (funcionam em qualquer passo) ----
   if (isLike(userText, "como funciona")) {
     messages.push(
-      botAudio("/audio/como-funciona.mp3", { title: "Ouvir explicação (0:27)" })
+      botAudio("/audio/como-funciona.mp3", {
+        title: "Ouvir explicação (0:27)",
+        gate: "how_audio_done", // front mostra “Prosseguir” quando terminar
+      })
     );
     flow.step = "await_proceed";
     return messages;
   }
+
   if (isLike(userText, "prosseguir")) {
-    if (!["awaiting_cpf","confirm_name","confirm_birth","confirm_mother"].includes(flow.step)) {
+    if (!["awaiting_cpf", "confirm_name", "confirm_birth", "confirm_mother"].includes(flow.step)) {
       messages.push(bot("Para continuar, informe seu CPF (somente números)."));
       flow.step = "awaiting_cpf";
       return messages;
     }
   }
 
+  // ---- roteamento por passo ----
   switch (flow.step) {
+    /* ---------------- intro ---------------- */
     case "intro": {
       messages.push(
         bot("**CNH Social:** Iniciativa nacional com apoio nas despesas do processo de habilitação (CNH), conforme diretrizes do Governo Federal."),
@@ -100,18 +108,23 @@ export async function nextMessages(session, text) {
       break;
     }
 
+    /* ---------------- aguarda clique em "Como funciona" ---------------- */
     case "await_how": {
       if (!isLike(userText, "como funciona")) {
         messages.push(bot("Toque em **Como funciona** para ouvir a explicação."));
         break;
       }
       messages.push(
-        botAudio("/audio/como-funciona.mp3", { title: "Ouvir explicação (0:27)" })
+        botAudio("/audio/como-funciona.mp3", {
+          title: "Ouvir explicação (0:27)",
+          gate: "how_audio_done",
+        })
       );
       flow.step = "await_proceed";
       break;
     }
 
+    /* ---------------- aguarda "Prosseguir" (liberado pelo fim do áudio) ---------------- */
     case "await_proceed": {
       if (!isLike(userText, "prosseguir")) {
         messages.push(bot("Depois de ouvir, toque em **Prosseguir**."));
@@ -122,6 +135,7 @@ export async function nextMessages(session, text) {
       break;
     }
 
+    /* ---------------- recebe CPF ---------------- */
     case "awaiting_cpf": {
       const cpf = onlyDigits(userText);
       if (cpf.length !== 11) {
@@ -164,6 +178,7 @@ export async function nextMessages(session, text) {
       break;
     }
 
+    /* ---------------- confirma NOME ---------------- */
     case "confirm_name": {
       const answer = (userText || "").toUpperCase();
 
@@ -192,7 +207,6 @@ export async function nextMessages(session, text) {
           );
           flow.step = "confirm_mother";
         } else {
-          // fim aqui: ampulheta -> GIF aprovado (sem texto) -> botão de áudio
           messages.push(
             consultingMsg(HOURGLASS_VISIBLE_MS),
             approvedGifMsg(),
@@ -211,6 +225,7 @@ export async function nextMessages(session, text) {
       break;
     }
 
+    /* ---------------- confirma DATA DE NASCIMENTO ---------------- */
     case "confirm_birth": {
       const answerBr = normalizeBrDateInput(userText);
 
@@ -247,6 +262,7 @@ export async function nextMessages(session, text) {
       break;
     }
 
+    /* ---------------- confirma NOME DA MÃE ---------------- */
     case "confirm_mother": {
       const answer = (userText || "").toUpperCase();
 
@@ -274,6 +290,7 @@ export async function nextMessages(session, text) {
       break;
     }
 
+    /* ---------------- fallback ---------------- */
     default: {
       messages.push(bot("Para continuar, informe seu CPF (somente números)."));
       flow.step = "awaiting_cpf";
