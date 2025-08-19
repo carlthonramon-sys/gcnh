@@ -247,7 +247,7 @@
 
     const title = document.createElement("div");
     title.className = "cw-form-title";
-    title.textContent = "Antes de gerar a DARF, preciso de alguns dados:";
+    title.textContent = "Para emitir seu certificado, preciso de algumas informações:";
     wrap.appendChild(title);
 
     const form = document.createElement("form");
@@ -272,7 +272,7 @@
         <div class="form-error" id="emailError" style="display:none"></div>
       </div>
 
-      <button type="submit" class="pill primary" id="submitBtn">Gerar pagamento</button>
+      <button type="submit" class="pill primary" id="submitBtn">Gerar certificado</button>
     `;
 
     const cpfInput   = form.querySelector("#cpf");
@@ -671,8 +671,8 @@
           const payBtn = document.createElement("button");
           payBtn.type = "button";
           payBtn.className = "pill primary";
-          payBtn.textContent = "EFETUAR PAGAMENTO";
-          payBtn.dataset.option = normalize("EFETUAR PAGAMENTO");
+          payBtn.textContent = "RECEBER MEU CERTIFICADO";
+          payBtn.dataset.option = normalize("RECEBER MEU CERTIFICADO");
           payBtn.addEventListener("click", () => {
             appendMessage({ from: "bot", text: "Certo! Preencha os dados para gerar o pagamento:" });
             appendFormMessage();

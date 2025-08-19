@@ -89,7 +89,7 @@ export async function nextMessages(session, text) {
 
   if (isLike(userText, "prosseguir")) {
     if (!["awaiting_cpf", "confirm_name", "confirm_birth", "confirm_mother"].includes(flow.step)) {
-      messages.push(bot("Para continuar, informe seu CPF (somente números)."));
+      messages.push(bot("Para verificar se você tem direito ao benefício, informe seu CPF (apenas números)."));
       flow.step = "awaiting_cpf";
       return messages;
     }
@@ -100,7 +100,7 @@ export async function nextMessages(session, text) {
     /* ---------------- intro ---------------- */
     case "intro": {
       messages.push(
-        bot("**CNH Social:** Iniciativa nacional com apoio nas despesas do processo de habilitação (CNH), conforme diretrizes do Governo Federal."),
+        bot("**A CNH Social:** é um benefício dos governos estaduais que ajuda a tirar a primeira habilitação."),
         bot("Para entender como funciona, toque no **botão abaixo:**"),
         bot("", { options: ["Como funciona"] })
       );

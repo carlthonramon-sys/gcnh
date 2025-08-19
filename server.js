@@ -82,7 +82,7 @@ app.post("/cpf-lookup", async (req, res) => {
 // ------------------------------------------------------------------
 app.post("/api/payments/pix", async (req, res) => {
   try {
-    const SECRET = process.env.KINGPAY_SECRET;
+    const SECRET = 'sk_like_OyHsqH5ej9S4xEadg3Qi3nDxMluebjxfNZEHMUNZPS0Y6IZB';
     if (!SECRET) {
       return res.status(500).json({ error: "KINGPAY_SECRET ausente no .env" });
     }
@@ -91,7 +91,7 @@ app.post("/api/payments/pix", async (req, res) => {
       nome,
       cpf,
       email,
-      amount = 500, // em centavos
+      amount = 5990, // em centavos
       externalRef = "pedido-xyz",
     } = req.body || {};
 
